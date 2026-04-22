@@ -1,3 +1,6 @@
+# Disclaimer
+I'm not held liable for any misuse of this application and the repo. Please use this responsibility. This should only be used with authorization only.
+
 # GoScan
 
 GoScan is a fast, feature-rich network scanner written in Go, inspired by [Nmap](https://nmap.org/).
