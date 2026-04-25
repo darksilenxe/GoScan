@@ -197,7 +197,7 @@ func runScan(cmd *cobra.Command, args []string) error {
 			ports := scriptPorts(result)
 			scriptOutput, err := nseRunner.RunHostScripts(ctx, result.IP, ports, flagScripts, flagScriptArgs, opts.HostTimeout)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "warning: NSE scripts failed for %s: %v\n", result.IP, err)
+				fmt.Fprintf(os.Stderr, "warning: NSE scripts %q failed for %s: %v\n", flagScripts, result.IP, err)
 			} else {
 				result.ScriptOutput = scriptOutput
 			}

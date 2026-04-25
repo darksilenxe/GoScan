@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const DefaultTimeout = 2 * time.Minute
+
 // Runner executes Nmap NSE scripts against a host.
 type Runner struct {
 	Binary string
@@ -23,6 +25,7 @@ func NewRunner(binary string) Runner {
 }
 
 // RunHostScripts runs NSE scripts for a host and returns raw Nmap output.
+// If timeout is <= 0, DefaultTimeout is used.
 func (r Runner) RunHostScripts(
 	ctx context.Context,
 	host string,
@@ -35,10 +38,10 @@ func (r Runner) RunHostScripts(
 		return "", nil
 	}
 	if timeout <= 0 {
-		timeout = 2 * time.Minute
+		timeout = DefaultTimeout
 	}
 	if ctx == nil {
-		ctx = context.Background()
+		return "", fmt.Errorf("context must not be nil")
 	}
 
 	runCtx, cancel := context.WithTimeout(ctx, timeout)
