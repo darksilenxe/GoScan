@@ -34,14 +34,14 @@ func (r Runner) RunHostScripts(
 	scriptArgs string,
 	timeout time.Duration,
 ) (string, error) {
+	if ctx == nil {
+		return "", fmt.Errorf("context must not be nil")
+	}
 	if strings.TrimSpace(scriptExpr) == "" {
 		return "", nil
 	}
 	if timeout <= 0 {
 		timeout = DefaultTimeout
-	}
-	if ctx == nil {
-		return "", fmt.Errorf("context must not be nil")
 	}
 
 	runCtx, cancel := context.WithTimeout(ctx, timeout)

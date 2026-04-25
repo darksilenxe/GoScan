@@ -18,7 +18,7 @@ GoScan is a fast, feature-rich network scanner written in Go, inspired by [Nmap]
 | Timing templates | `-T0`…`-T5` | paranoid → insane |
 | Service detection | `-sV` | Banner grab + service name lookup |
 | OS fingerprinting | `-O` | TTL-based + banner heuristics |
-| Nmap script engine (NSE) | `--script`, `--script-args` | Runs Nmap NSE scripts (including `all`) via installed `nmap` |
+| Nmap script engine (NSE) | `--script`, `--script-args` | Run Nmap NSE scripts (including `all`) via installed `nmap` |
 | Normal output | stdout / `-oN` | Nmap-style human-readable |
 | XML output | `-oX` | Nmap-compatible XML schema |
 | JSON output | `-oJ` | Machine-readable JSON |
