@@ -18,6 +18,7 @@ GoScan is a fast, feature-rich network scanner written in Go, inspired by [Nmap]
 | Timing templates | `-T0`…`-T5` | paranoid → insane |
 | Service detection | `-sV` | Banner grab + service name lookup |
 | OS fingerprinting | `-O` | TTL-based + banner heuristics |
+| Nmap script engine (NSE) | `--script`, `--script-args` | Run Nmap NSE scripts (including `all`) via installed `nmap` |
 | Normal output | stdout / `-oN` | Nmap-style human-readable |
 | XML output | `-oX` | Nmap-compatible XML schema |
 | JSON output | `-oJ` | Machine-readable JSON |
@@ -65,6 +66,9 @@ sudo goscan -sS -sV 192.168.1.0/24
 # Scan specific ports with OS detection
 goscan -p 22,80,443,8080 -O scanme.nmap.org
 
+# Run all NSE scripts through nmap (requires nmap installed)
+goscan --script all -p 22,80,443 scanme.nmap.org
+
 # Full port scan, aggressive timing
 goscan -p- -T4 10.0.0.1
 
@@ -93,6 +97,8 @@ goscan -Pn -v -p 1-1024 192.168.1.1
   -T <0-5>      Timing template (default: 3/normal)
   -sV           Probe open ports to determine service/version
   -O            Enable OS detection
+  --script      Run Nmap NSE scripts (e.g. default,vuln,http-*)
+  --script-args Arguments passed to NSE scripts (name=value pairs)
   -v            Verbose output (show closed/filtered ports, banners)
   -oN <file>    Save normal output to file
   -oX <file>    Save XML output to file
@@ -128,6 +134,9 @@ go test ./...
   Ports that return no response are marked `open|filtered`.
 - OS detection is heuristic (TTL value + banner keywords) and less precise than Nmap's
   full TCP/IP stack fingerprinting.
+- NSE support depends on a local `nmap` binary. GoScan executes Nmap scripts by
+  shelling out to `nmap --script ...`, so all installed NSE scripts are available
+  (including `--script all`).
 
 ## License
 

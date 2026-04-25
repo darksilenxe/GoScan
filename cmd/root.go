@@ -5,11 +5,13 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sort"
 	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/darksilenxe/goscan/internal/nse"
 	"github.com/darksilenxe/goscan/internal/output"
 	"github.com/darksilenxe/goscan/internal/port"
 	"github.com/darksilenxe/goscan/internal/scanner"
@@ -33,6 +35,8 @@ var (
 	// Detection
 	flagServiceDetect bool
 	flagOSDetect      bool
+	flagScripts       string
+	flagScriptArgs    string
 
 	// Output
 	flagVerbose    bool
@@ -43,7 +47,7 @@ var (
 
 	// Advanced
 	flagParallelism int
-	flagTimeout     int  // milliseconds
+	flagTimeout     int // milliseconds
 )
 
 // rootCmd is the root GoScan command.
@@ -92,6 +96,8 @@ func init() {
 	// Detection
 	rootCmd.Flags().BoolVarP(&flagServiceDetect, "sV", "", false, "Probe open ports to determine service/version")
 	rootCmd.Flags().BoolVarP(&flagOSDetect, "O", "", false, "Enable OS detection")
+	rootCmd.Flags().StringVar(&flagScripts, "script", "", "Run Nmap NSE scripts (e.g. default,vuln,http-*)")
+	rootCmd.Flags().StringVar(&flagScriptArgs, "script-args", "", "Arguments passed to NSE scripts (name=value pairs)")
 
 	// Output
 	rootCmd.Flags().BoolVarP(&flagVerbose, "verbose", "v", false, "Verbose output")
@@ -184,8 +190,19 @@ func runScan(cmd *cobra.Command, args []string) error {
 
 	scanStart := time.Now()
 	var allResults []scanner.HostResult
+	nseRunner := nse.NewRunner("")
 
 	for result := range resultCh {
+		if flagScripts != "" && result.IsUp {
+			ports := scriptPorts(result)
+			scriptOutput, err := nseRunner.RunHostScripts(ctx, result.IP, ports, flagScripts, flagScriptArgs, opts.HostTimeout)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "warning: NSE scripts %q failed for %s: %v\n", flagScripts, result.IP, err)
+			} else {
+				result.ScriptOutput = scriptOutput
+			}
+		}
+
 		allResults = append(allResults, result)
 		for _, w := range writers {
 			w.WriteHostResult(result, flagVerbose)
@@ -236,4 +253,20 @@ func closeWriters() {
 	for _, f := range fileWriters {
 		_ = f.Close()
 	}
+}
+
+func scriptPorts(result scanner.HostResult) []int {
+	uniq := map[int]struct{}{}
+	for _, p := range result.Ports {
+		if p.State != scanner.StateOpen && p.State != scanner.StateOpenFiltered {
+			continue
+		}
+		uniq[p.Port] = struct{}{}
+	}
+	ports := make([]int, 0, len(uniq))
+	for p := range uniq {
+		ports = append(ports, p)
+	}
+	sort.Ints(ports)
+	return ports
 }
