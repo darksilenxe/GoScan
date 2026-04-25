@@ -16,9 +16,9 @@ import (
 type Format string
 
 const (
-	FormatNormal Format = "normal"
-	FormatXML    Format = "xml"
-	FormatJSON   Format = "json"
+	FormatNormal   Format = "normal"
+	FormatXML      Format = "xml"
+	FormatJSON     Format = "json"
 	FormatGrepable Format = "grepable"
 )
 
@@ -156,6 +156,17 @@ func writeNormal(w io.Writer, r scanner.HostResult, verbose bool) {
 			fmt.Fprintf(w, "  |_ Banner: %s\n", firstLine(p.Banner))
 		}
 	}
+
+	if r.ScriptOutput != "" {
+		fmt.Fprintln(w, "\nHost script results:")
+		for _, line := range strings.Split(r.ScriptOutput, "\n") {
+			line = strings.TrimSpace(line)
+			if line == "" {
+				continue
+			}
+			fmt.Fprintf(w, "|_ %s\n", line)
+		}
+	}
 }
 
 func firstLine(s string) string {
@@ -189,19 +200,20 @@ func writeGrepable(w io.Writer, r scanner.HostResult) {
 // ─── JSON format ──────────────────────────────────────────────────────────────
 
 type jsonReport struct {
-	GeneratedAt string            `json:"generated_at"`
-	ElapsedSec  float64           `json:"elapsed_seconds"`
-	Hosts       []jsonHost        `json:"hosts"`
+	GeneratedAt string     `json:"generated_at"`
+	ElapsedSec  float64    `json:"elapsed_seconds"`
+	Hosts       []jsonHost `json:"hosts"`
 }
 
 type jsonHost struct {
-	IP       string      `json:"ip"`
-	Hostname string      `json:"hostname,omitempty"`
-	IsUp     bool        `json:"is_up"`
-	OS       string      `json:"os,omitempty"`
-	TTL      int         `json:"ttl,omitempty"`
-	Latency  string      `json:"latency,omitempty"`
-	Ports    []jsonPort  `json:"ports,omitempty"`
+	IP           string     `json:"ip"`
+	Hostname     string     `json:"hostname,omitempty"`
+	IsUp         bool       `json:"is_up"`
+	OS           string     `json:"os,omitempty"`
+	TTL          int        `json:"ttl,omitempty"`
+	Latency      string     `json:"latency,omitempty"`
+	Ports        []jsonPort `json:"ports,omitempty"`
+	ScriptOutput string     `json:"script_output,omitempty"`
 }
 
 type jsonPort struct {
@@ -220,11 +232,12 @@ func writeJSON(w io.Writer, results []scanner.HostResult, elapsed time.Duration)
 	}
 	for _, r := range results {
 		jh := jsonHost{
-			IP:       r.IP,
-			Hostname: r.Hostname,
-			IsUp:     r.IsUp,
-			OS:       r.OS,
-			TTL:      r.TTL,
+			IP:           r.IP,
+			Hostname:     r.Hostname,
+			IsUp:         r.IsUp,
+			OS:           r.OS,
+			TTL:          r.TTL,
+			ScriptOutput: r.ScriptOutput,
 		}
 		if r.Latency > 0 {
 			jh.Latency = r.Latency.String()
@@ -249,18 +262,19 @@ func writeJSON(w io.Writer, results []scanner.HostResult, elapsed time.Duration)
 // ─── XML format ───────────────────────────────────────────────────────────────
 
 type xmlNmapRun struct {
-	XMLName   xml.Name  `xml:"nmaprun"`
-	Scanner   string    `xml:"scanner,attr"`
-	StartStr  string    `xml:"startstr,attr"`
-	ElapsedSec string   `xml:"elapsed,attr"`
-	Hosts     []xmlHost `xml:"host"`
+	XMLName    xml.Name  `xml:"nmaprun"`
+	Scanner    string    `xml:"scanner,attr"`
+	StartStr   string    `xml:"startstr,attr"`
+	ElapsedSec string    `xml:"elapsed,attr"`
+	Hosts      []xmlHost `xml:"host"`
 }
 
 type xmlHost struct {
-	Status  xmlStatus  `xml:"status"`
-	Address xmlAddress `xml:"address"`
-	Ports   *xmlPorts  `xml:"ports,omitempty"`
-	OS      *xmlOS     `xml:"os,omitempty"`
+	Status     xmlStatus      `xml:"status"`
+	Address    xmlAddress     `xml:"address"`
+	Ports      *xmlPorts      `xml:"ports,omitempty"`
+	OS         *xmlOS         `xml:"os,omitempty"`
+	HostScript *xmlHostScript `xml:"hostscript,omitempty"`
 }
 
 type xmlStatus struct {
@@ -277,9 +291,9 @@ type xmlPorts struct {
 }
 
 type xmlPort struct {
-	Protocol string    `xml:"protocol,attr"`
-	Portid   int       `xml:"portid,attr"`
-	State    xmlState  `xml:"state"`
+	Protocol string     `xml:"protocol,attr"`
+	Portid   int        `xml:"portid,attr"`
+	State    xmlState   `xml:"state"`
 	Service  xmlService `xml:"service"`
 }
 
@@ -294,6 +308,10 @@ type xmlService struct {
 
 type xmlOS struct {
 	Match string `xml:"osmatch,attr,omitempty"`
+}
+
+type xmlHostScript struct {
+	Output string `xml:"output,attr,omitempty"`
 }
 
 func writeXML(w io.Writer, results []scanner.HostResult, elapsed time.Duration) {
@@ -324,6 +342,9 @@ func writeXML(w io.Writer, results []scanner.HostResult, elapsed time.Duration) 
 		}
 		if r.OS != "" {
 			xh.OS = &xmlOS{Match: r.OS}
+		}
+		if r.ScriptOutput != "" {
+			xh.HostScript = &xmlHostScript{Output: r.ScriptOutput}
 		}
 		run.Hosts = append(run.Hosts, xh)
 	}
