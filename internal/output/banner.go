@@ -45,7 +45,11 @@ var startupGophers = []string{
 		"   |   GoScan is starting!    |\n",
 }
 
+func startupBannerAt(index int) string {
+	return startupGophers[index%len(startupGophers)]
+}
+
 // WriteStartupBanner writes the Go Gopher startup banner.
 func WriteStartupBanner(w io.Writer) {
-	fmt.Fprint(w, startupGophers[rand.IntN(len(startupGophers))])
+	fmt.Fprint(w, startupBannerAt(rand.IntN(len(startupGophers))))
 }
