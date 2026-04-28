@@ -106,9 +106,9 @@ func TestGrepableOutput(t *testing.T) {
 	}
 }
 
-func TestWriteCompletionArt(t *testing.T) {
+func TestWriteStartupBanner(t *testing.T) {
 	var buf bytes.Buffer
-	output.WriteCompletionArt(&buf)
+	output.WriteStartupBanner(&buf)
 
 	out := buf.String()
 	if !strings.Contains(out, "GoScan is starting!") {

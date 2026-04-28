@@ -175,7 +175,7 @@ func runScan(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("no valid targets specified")
 	}
 
-	output.WriteCompletionArt(os.Stdout)
+	output.WriteStartupBanner(os.Stdout)
 
 	// Set up output writers
 	writers := buildWriters(cmd)

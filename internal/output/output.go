@@ -28,27 +28,9 @@ type Writer struct {
 	format Format
 }
 
-const startupGopher = "\n" +
-	"   ,_---~~~~~----._\n" +
-	"_,,_,*^____      _____``*g*\\\"*,\n" +
-	"/ __/ /'     ^.  /      \\ ^@q   f\n" +
-	"[  @f | @))    |  | @))   l  0 _/\n" +
-	" \\`/   \\~____ / __ \\_____/    \\\n" +
-	"  |           _l__l_           I\n" +
-	"  }          [______]          I\n" +
-	"  ]            | | |           |\n" +
-	"  ]             ~ ~            |\n" +
-	"  |                            |\n" +
-	"   |   GoScan is starting!    |\n"
-
 // NewWriter creates a new output Writer.
 func NewWriter(w io.Writer, format Format) *Writer {
 	return &Writer{w: w, format: format}
-}
-
-// WriteStartupBanner writes the Go Gopher startup banner.
-func WriteStartupBanner(w io.Writer) {
-	fmt.Fprint(w, startupGopher)
 }
 
 // WriteHeader writes the scan header.
