@@ -117,4 +117,15 @@ func TestWriteStartupBanner(t *testing.T) {
 	if !strings.Contains(out, ",_---~~~~~----._") {
 		t.Error("expected gopher art in output")
 	}
+	frameMarkers := []string{
+		"|      (^_^) /               |",
+		"|               \\ (^_^)      |",
+		"|          \\o(^_^)o/         |",
+	}
+	for _, marker := range frameMarkers {
+		if strings.Contains(out, marker) {
+			return
+		}
+	}
+	t.Error("expected one of the randomized gopher animation frames")
 }
