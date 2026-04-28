@@ -28,7 +28,7 @@ type Writer struct {
 	format Format
 }
 
-const completionGopher = "\n" +
+const startupGopher = "\n" +
 	"   ,_---~~~~~----._\n" +
 	"_,,_,*^____      _____``*g*\\\"*,\n" +
 	"/ __/ /'     ^.  /      \\ ^@q   f\n" +
@@ -46,9 +46,9 @@ func NewWriter(w io.Writer, format Format) *Writer {
 	return &Writer{w: w, format: format}
 }
 
-// WriteCompletionArt writes the Go Gopher completion art.
-func WriteCompletionArt(w io.Writer) {
-	fmt.Fprint(w, completionGopher)
+// WriteStartupBanner writes the Go Gopher startup banner.
+func WriteStartupBanner(w io.Writer) {
+	fmt.Fprint(w, startupGopher)
 }
 
 // WriteHeader writes the scan header.
