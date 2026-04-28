@@ -28,19 +28,18 @@ type Writer struct {
 	format Format
 }
 
-const completionGopher = `
-   ,_---~~~~~----._
-_,,_,*^____      _____``*g*\"*,
-/ __/ /'     ^.  /      \ ^@q   f
-[  @f | @))    |  | @))   l  0 _/
- \`/   \~____ / __ \_____/    \
-  |           _l__l_           I
-  }          [______]          I
-  ]            | | |           |
-  ]             ~ ~            |
-  |                            |
-   |   GoScan is starting!    |
-`
+const completionGopher = "\n" +
+	"   ,_---~~~~~----._\n" +
+	"_,,_,*^____      _____``*g*\\\"*,\n" +
+	"/ __/ /'     ^.  /      \\ ^@q   f\n" +
+	"[  @f | @))    |  | @))   l  0 _/\n" +
+	" \\`/   \\~____ / __ \\_____/    \\\n" +
+	"  |           _l__l_           I\n" +
+	"  }          [______]          I\n" +
+	"  ]            | | |           |\n" +
+	"  ]             ~ ~            |\n" +
+	"  |                            |\n" +
+	"   |   GoScan is starting!    |\n"
 
 // NewWriter creates a new output Writer.
 func NewWriter(w io.Writer, format Format) *Writer {
@@ -49,7 +48,7 @@ func NewWriter(w io.Writer, format Format) *Writer {
 
 // WriteCompletionArt writes the Go Gopher completion art.
 func WriteCompletionArt(w io.Writer) {
-	fmt.Fprintln(w, completionGopher)
+	fmt.Fprint(w, completionGopher)
 }
 
 // WriteHeader writes the scan header.
