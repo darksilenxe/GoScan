@@ -39,7 +39,7 @@ _,,_,*^____      _____``*g*\"*,
   ]            | | |           |
   ]             ~ ~            |
   |                            |
-   |  GoScan complete. Thanks!|
+   |   GoScan is starting!    |
 `
 
 // NewWriter creates a new output Writer.

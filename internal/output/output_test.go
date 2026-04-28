@@ -105,3 +105,16 @@ func TestGrepableOutput(t *testing.T) {
 		t.Error("expected port info in grepable output")
 	}
 }
+
+func TestWriteCompletionArt(t *testing.T) {
+	var buf bytes.Buffer
+	output.WriteCompletionArt(&buf)
+
+	out := buf.String()
+	if !strings.Contains(out, "GoScan is starting!") {
+		t.Error("expected startup message in completion art")
+	}
+	if !strings.Contains(out, ",_---~~~~~----._") {
+		t.Error("expected gopher art in output")
+	}
+}
